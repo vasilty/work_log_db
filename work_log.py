@@ -83,8 +83,9 @@ def get_time_spent(message=None):
         time = validate_time(time_input=time_input.lower())
         # If time is in the correct format
         if time is not None:
-            # Convert time to minutes and check that it is positive.
+            # Converts time to minutes.
             time_min = convert_time_spent_to_min(time[0])
+            # Check that time is positive.
             if time_min <= 0:
                 message = "Time spent must be positive!"
             else:
@@ -107,7 +108,7 @@ def get_date(message=None):
         if message:
             print(message)
         date_input = input('Date (dd.mm.yyyy):\n')
-        # Checks that date is valid
+        # Checks that the input date is a valid date.
         try:
             date = datetime.datetime.strptime(date_input, '%d.%m.%Y').date()
         except ValueError:
@@ -117,6 +118,7 @@ def get_date(message=None):
 
 
 def print_entry(entry):
+    """Prints an entry to a screen."""
     print('User name: {}'.format(entry.name))
     print('Project: {}'.format(entry.project))
     print('Task name: {}'.format(entry.task_name))
@@ -127,7 +129,7 @@ def print_entry(entry):
 
 
 def get_entry_data():
-    """Get data for an entry."""
+    """Get entry data from user."""
     name = get_key_name(key="User")
     project = get_key_name(key="Project")
     task_name = get_key_name(key="Task")
@@ -152,7 +154,7 @@ def add_entry():
 
 
 def save_delete_edit_entry(entry):
-    """Provides options to save delete or edit entry."""
+    """Provides options to save, delete or edit entry."""
     while True:
         clear()
         print_entry(entry=entry)
@@ -211,6 +213,7 @@ def edit_entry(entry):
 
 
 def show_results(entries):
+    """Shows search results with the ability to navigate through them."""
     if entries:
         index = 0
         while True:
@@ -258,6 +261,7 @@ def show_results(entries):
 
 
 def search_by_term():
+    """Searches by a term in the task name and notes."""
     clear()
     string = input('Exact string or regular expression: ')
     match = r'' + string
@@ -268,6 +272,7 @@ def search_by_term():
 
 
 def search_by_time_spent(message=None):
+    """Searches by time spent and time spent range."""
     clear()
     if message:
         print(message)
@@ -276,9 +281,12 @@ def search_by_time_spent(message=None):
                        ' ').lower().strip()
     match = r'(?P<value>[0-9]+.?[0-9]*)\s*(?P<format>[wdhm])'
     times = re.findall(match, time_input)
+    # If time in the correct format was given.
     if times:
+        # Converts time to minutes.
         times_min = map(convert_time_spent_to_min, times)
         sorted_times_min = sorted(times_min)
+        # If a single time or time range was given.
         if len(times) < 3:
             entries = Entry.select().where(
                 (Entry.time_spent >= sorted_times_min[0]) & (
@@ -291,6 +299,7 @@ def search_by_time_spent(message=None):
 
 
 def search_by_project():
+    """Serches by the project name."""
     clear()
     string = input('Project name: ').strip()
     entries = Entry.select().where(Entry.project ** string)
@@ -298,6 +307,7 @@ def search_by_project():
 
 
 def search_by_name():
+    """Searches by the employee name."""
     clear()
     string = input('Employee name: ').strip()
     entries = Entry.select().where(Entry.name ** (string+'%'))
@@ -305,6 +315,7 @@ def search_by_name():
 
 
 def list_of_dates(entries):
+    """Returns a list of all dates with entries."""
     dates = []
     for entry in entries:
         if entry.date not in dates:
@@ -314,13 +325,14 @@ def list_of_dates(entries):
 
 
 def print_list_of_dates(dates):
-    """Prints a list of sorted dates."""
+    """Prints a list of dates to the screen."""
     print('Dates with entries:')
     for date in dates:
         print(date.strftime('%d.%m.%Y'))
 
 
 def search_by_date(message=None):
+    """Searches by date."""
     clear()
     dt_date_range = []
     if message:
@@ -341,6 +353,7 @@ def search_by_date(message=None):
             else:
                 dt_date_range.append(dt_date)
         sorted_date_range = sorted(dt_date_range)
+        # If a single date or a date range was given.
         if len(date_range) < 3:
             entries = Entry.select().where(
                 (Entry.date >= sorted_date_range[0]) & (
@@ -353,7 +366,7 @@ def search_by_date(message=None):
 
 
 def find_entries():
-    """Look up an entry."""
+    """Provides all possible search options."""
     while True:
         clear()
         choice = input(
